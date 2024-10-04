@@ -12,75 +12,56 @@ Addon.data.chores.choresWarWithin = {
             key = 'patch_11_0_0',
             quests = {
                 {
-                    key = 'awakeningTheMachine',
-                    minimumLevel = 70,
-                    entries = {
-                        { quest = 83333 }, -- Gearing Up for Trouble
-                    }
-                },
-                {
-                    key = 'rollinDown',
-                    minimumLevel = 80,
-                    entries = {
-                        { quest = 82946 }, -- Rollin' Down in the Deeps
-                    }
-                },
-                {
-                    key = 'spreadingTheLight',
-                    minimumLevel = 70,
-                    entries = {
-                        { quest = 76586 }, -- Spreading the Light
-                    }
-                },
-                {
-                    key = 'theaterTroupe',
-                    minimumLevel = 70,
-                    entries = {
-                        { quest = 83240 }, -- The Theater Troupe
-                    },
-                },
-                {
-                    key = 'spiderPact',
-                    minimumLevel = 70,
-                    entries = {
-                        { quest = 80544 }, -- The Weaver
-                        { quest = 80545 }, -- The General
-                        { quest = 80546 }, -- The Vizier
-                    },
-                },
-                {
-                    key = 'spiderWeekly',
-                    minimumLevel = 70,
-                    entries = {
-                        { quest = 80670 }, -- Eyes of the Weaver
-                        { quest = 80671 }, -- Blade of the General
-                        { quest = 80672 }, -- Hand of the Vizier
-                    },
-                },
-                {
-                    key = 'dungeon',
+                    key = 'worldBoss',
                     minimumLevel = 80,
                     alwaysQuestName = true,
                     entries = {
-                        { quest = 83465 }, -- Ara-Kara, City of Echoes
-                        { quest = 83436 }, -- Cinderbrew Meadery
-                        { quest = 83469 }, -- City of Threads
-                        { quest = 83443 }, -- Darkflame Cleft
-                        { quest = 83458 }, -- Priory of the Sacred Flame
-                        { quest = 83459 }, -- The Dawnbreaker
-                        { quest = 83432 }, -- The Rookery
-                        { quest = 83457 }, -- The Stonevault
+                        { quest = 81624 }, -- Orta, the Broken Mountain
+                        { quest = 81630 }, -- Kordac, the Dormant Protector
+                        { quest = 81653 }, -- Shurrai, Atrocity of the Undersea
+                        { quest = 83466, actualQuest = 82653 }, -- Aggregation of Horrors
+                    }
+                },
+                {
+                    key = 'delveKeys',
+                    groupSameItem = true,
+                    entries = {
+                        { quest=84736, item=224172 }, -- Restored Coffer Key
+                        { quest=84737, item=224172 }, -- Restored Coffer Key
+                        { quest=84738, item=224172 }, -- Restored Coffer Key
+                        { quest=84739, item=224172 }, -- Restored Coffer Key
                     },
                 },
                 {
-                    key = 'worldsoul',
+                    key = 'emissaryArchives',
+                    minimumLevel = 80,
+                    entries = {
+                        { quest = 82679 }, -- Archives: Seeking History
+                        { quest = 82678 }, -- Archives: The First Disc
+                    },
+                },
+                {
+                    key = 'emissaryDelves',
+                    minimumLevel = 80,
+                    entries = {
+                        { quest = 82746 }, -- Delves: Breaking Tough to Loot Stuff
+                        { quest = 82707 }, -- Delves: Earthen Defense
+                        { quest = 82710 }, -- Delves: Empire-ical Exploration
+                        { quest = 82706 }, -- Delves: Khaz Algar Research
+                        { quest = 82711 }, -- Delves: Lost and Found
+                        { quest = 82708 }, -- Delves: Nerubian Menace
+                        { quest = 82709 }, -- Delves: Percussive Archaeology
+                        { quest = 82712 }, -- Delves: Trouble Up and Down Khaz Algar
+                    },
+                },
+                {
+                    key = 'emissaryWorldsoul',
                     minimumLevel = 70,
-                    chooseQuest = true,
                     entries = {
                         { quest = 82511 }, -- Worldsoul: Awakening Machine
                         { quest = 82453 }, -- Worldsoul: Encore!
+                        { quest = 82516 }, -- Worldsoul: Forging a Pact
                         { quest = 82458 }, -- Worldsoul: Renown
-                        { quest = 82516 }, -- Worldsoul: Severed Threads Pact
                         { quest = 82482 }, -- Worldsoul: Snuffling
                         { quest = 82483 }, -- Worldsoul: Spreading the Light
                         { quest = 82512 }, -- Worldsoul: World Boss
@@ -115,25 +96,87 @@ Addon.data.chores.choresWarWithin = {
                     },
                 },
                 {
-                    key = 'delveKeys',
-                    groupSameItem = true,
+                    key = 'specialAssignment',
+                    minimumLevel = 70,
+                    pick = 2,
+                    alwaysShowObjectives = true,
+                    removeText = L['remove_specialAssignment'],
                     entries = {
-                        { quest=84736, item=224172 }, -- Restored Coffer Key
-                        { quest=84737, item=224172 }, -- Restored Coffer Key
-                        { quest=84738, item=224172 }, -- Restored Coffer Key
-                        { quest=84739, item=224172 }, -- Restored Coffer Key
+                        { quest = 82414, unlockQuest = 82159 }, -- Special Assignment: A Pound of Cure
+                        { quest = 82531, unlockQuest = 82161 }, -- Special Assignment: Bombs From Behind
+                        { quest = 82355, unlockQuest = 82146 }, -- Special Assignment: Cinderbee Surge
+                        { quest = 82852, unlockQuest = 82158 }, -- Special Assignment: Lynx Rescue
+                        { quest = 82787, unlockQuest = 82157 }, -- Special Assignment: Rise of the Colossals
+                        { quest = 81691, unlockQuest = 82155 }, -- Special Assignment: Shadows Below
+                        -- Why are there 3?
+                        { quest = 81647, unlockQuest = 82154 }, -- Special Assignment: Titanic Resurgence
+                        { quest = 81649, unlockQuest = 83069 }, -- Special Assignment: Titanic Resurgence
+                        { quest = 81650, unlockQuest = 83070 }, -- Special Assignment: Titanic Resurgence
+                        { quest = 83229, unlockQuest = 82156 }, -- Special Assignment: When the Deeps Stir
                     },
                 },
                 {
-                    key = 'sparksOfWar',
+                    key = 'spreadingTheLight',
                     minimumLevel = 70,
                     entries = {
-                        { quest=81793 }, -- Sparks of War: Isle of Dorn
-                        { quest=81794 }, -- Sparks of War: The Ringing Deeps
-                        { quest=81795 }, -- Sparks of War: Hallowfall
-                        { quest=81796 }, -- Sparks of War: Azj-Kahet
+                        { quest = 76586 }, -- Spreading the Light
+                    }
+                },
+                {
+                    key = 'spiderPact',
+                    minimumLevel = 70,
+                    entries = {
+                        { quest = 80544 }, -- The Weaver
+                        { quest = 80545 }, -- The General
+                        { quest = 80546 }, -- The Vizier
                     },
-                }
+                },
+                {
+                    key = 'spiderWeekly',
+                    minimumLevel = 70,
+                    alwaysShowObjectives = true,
+                    entries = {
+                        { quest = 80670 }, -- Eyes of the Weaver
+                        { quest = 80671 }, -- Blade of the General
+                        { quest = 80672 }, -- Hand of the Vizier
+                    },
+                },
+                {
+                    key = 'theaterTroupe',
+                    minimumLevel = 80,
+                    entries = {
+                        { quest = 83240 }, -- The Theater Troupe
+                    },
+                },
+                {
+                    key = 'awakeningTheMachine',
+                    minimumLevel = 70,
+                    entries = {
+                        { quest = 83333 }, -- Gearing Up for Trouble
+                    }
+                },
+                {
+                    key = 'rollinDown',
+                    minimumLevel = 80,
+                    entries = {
+                        { quest = 82946 }, -- Rollin' Down in the Deeps
+                    }
+                },
+                {
+                    key = 'dungeon',
+                    minimumLevel = 80,
+                    alwaysQuestName = true,
+                    entries = {
+                        { quest = 83465 }, -- Ara-Kara, City of Echoes
+                        { quest = 83436 }, -- Cinderbrew Meadery
+                        { quest = 83469 }, -- City of Threads
+                        { quest = 83443 }, -- Darkflame Cleft
+                        { quest = 83458 }, -- Priory of the Sacred Flame
+                        { quest = 83459 }, -- The Dawnbreaker
+                        { quest = 83432 }, -- The Rookery
+                        { quest = 83457 }, -- The Stonevault
+                    },
+                },
             },
         },
     },

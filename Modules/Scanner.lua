@@ -3,18 +3,24 @@ local L = Addon.L
 local Module = Addon:NewModule(
     'Scanner',
     {
+        autoAccept = {},
         dungeons = {},
+        pois = {},
         quests = {},
         questPaths = {},
         scanDungeons = {},
+        scanPois = {},
     }
 )
 
 
+local CAPI_GetAreaPOIInfo = C_AreaPoiInfo.GetAreaPOIInfo
 local CDAT_GetSecondsUntilWeeklyReset = C_DateAndTime.GetSecondsUntilWeeklyReset
 local CQL_GetQuestObjectives = C_QuestLog.GetQuestObjectives
 local CQL_IsOnQuest = C_QuestLog.IsOnQuest
 local CQL_IsQuestFlaggedCompleted = C_QuestLog.IsQuestFlaggedCompleted
+local CQL_IsWorldQuest = C_QuestLog.IsWorldQuest
+local CTQ_GetQuestTimeLeftSeconds = C_TaskQuest.GetQuestTimeLeftSeconds
 local CTSUI_GetProfessionInfoBySkillLineID = C_TradeSkillUI.GetProfessionInfoBySkillLineID
 
 local DATA_TYPES = {
@@ -22,6 +28,7 @@ local DATA_TYPES = {
     'dungeons',
     'quests',
 }
+local OPTIONAL_OBJECTIVE = OPTIONAL_QUEST_OBJECTIVE_DESCRIPTION:gsub('%%s', '.+'):gsub('([%(%)])', '%%%1')
 local STATUS_NOT_STARTED = 0
 local STATUS_IN_PROGRESS = 1
 local STATUS_COMPLETED = 2
@@ -40,7 +47,13 @@ function Module:OnEnable()
         1,
         'UpdateSkillLines'
     )
-
+    self:RegisterBucketEvent(
+        {
+            'AREA_POIS_UPDATED',
+        },
+        2,
+        'ScanPois'
+    )
     self:RegisterBucketEvent(
         {
             'ENCOUNTER_LOOT_RECEIVED',
@@ -162,8 +175,10 @@ function Module:UpdateSkillLines()
 end
 
 function Module:InitializeData()
+    wipe(self.autoAccept)
     wipe(self.questPaths)
     wipe(self.scanDungeons)
+    wipe(self.scanPois)
 
     for sectionKey, sectionData in pairs(Addon.data.chores) do
         if sectionData.skillLineId == nil or Addon.db.char.skillLines[sectionData.skillLineId] ~= nil then
@@ -171,10 +186,29 @@ function Module:InitializeData()
                 for _, typeKey in ipairs(DATA_TYPES) do
                     for _, choreData in ipairs(catData[typeKey] or {}) do
                         local choreKey = sectionKey .. '.' .. catData.key .. '.' .. typeKey .. '.' .. choreData.key
-                        
+
                         if choreData.entries ~= nil then
+                            local acceptKey = 'autoAccept:' .. sectionKey .. ':' .. catData.key .. ':' .. choreData.key
+                            local translation = L[acceptKey]
+                            local questIds = nil
+                            if translation ~= acceptKey then
+                                questIds = {}
+                                self.autoAccept[choreKey] = { translation, questIds }
+                            end
+
                             for _, choreEntry in ipairs(choreData.entries) do
                                 self.questPaths[choreEntry.quest] = choreKey
+                                
+                                if questIds ~= nil then
+                                    tinsert(questIds, choreEntry.quest)
+                                end
+
+                                if choreEntry.actualQuest then
+                                    self.questPaths[choreEntry.actualQuest] = choreKey
+                                end
+                                if choreEntry.unlockQuest then
+                                    self.questPaths[choreEntry.unlockQuest] = choreKey
+                                end
                             end
                         end
 
@@ -190,8 +224,19 @@ function Module:InitializeData()
             end
         end
     end
-    
+
+    for _, sectionData in pairs(Addon.data.delves) do
+        for _, mapData in ipairs(sectionData.zones) do
+            for _, poi in ipairs(mapData.pois) do
+                self.scanPois[poi.active] = mapData.uiMapId
+                self.scanPois[poi.inactive] = mapData.uiMapId
+                self.questPaths[poi.quest] = true
+            end
+        end
+    end
+
     self:ScanDungeons()
+    self:ScanPois()
     self:ScanQuests(true)
 end
 
@@ -209,6 +254,26 @@ function Module:GetWeek()
     local weeklyReset = time() + CDAT_GetSecondsUntilWeeklyReset()
     Addon.db.global.questWeeks[weeklyReset] = Addon.db.global.questWeeks[weeklyReset] or {}
     return Addon.db.global.questWeeks[weeklyReset]
+end
+
+function Module:ScanPois()
+    local anyChanges = false
+
+    for areaPoiId, uiMapId in pairs(self.scanPois) do
+        -- { linkedUiMapId, name }
+        local poiInfo = CAPI_GetAreaPOIInfo(uiMapId, areaPoiId)
+        if poiInfo ~= nil and self.pois[areaPoiId] == nil then
+            anyChanges = true
+            self.pois[areaPoiId] = poiInfo
+        elseif poiInfo == nil and self.pois[areaPoiId] ~= nil then
+            anyChanges = true
+            self.pois[areaPoiId] = nil
+        end
+    end
+
+    if anyChanges then
+        self:SendMessage('ChoreTracker_Data_Updated', 'pois')
+    end
 end
 
 function Module:ScanQuests(forceChanged)
@@ -239,20 +304,25 @@ function Module:UpdateQuest(questId, week, forceStatus)
 
     if newData.status == STATUS_COMPLETED or CQL_IsQuestFlaggedCompleted(questId) then
         newData.status = STATUS_COMPLETED
-    elseif newData.status == STATUS_IN_PROGRESS or CQL_IsOnQuest(questId) then
+    elseif newData.status == STATUS_IN_PROGRESS or
+        CQL_IsOnQuest(questId) or
+        (CQL_IsWorldQuest(questId) and CTQ_GetQuestTimeLeftSeconds(questId))
+    then
         newData.status = STATUS_IN_PROGRESS
         local objectives = CQL_GetQuestObjectives(questId)
         if objectives ~= nil then
             newData.objectives = {}
             for _, objective in ipairs(objectives) do
-                if objective ~= nil then
+                if objective ~= nil and (
+                    not objective.text or not string.match(objective.text, OPTIONAL_OBJECTIVE)
+                ) then
                     local objectiveData = {
                         type = objective.type,
                         text = gsub(
                             objective.text,
                             ":18:18:0:2%|a",
                             ":0:0:0:2|a"
-                        ),objective.text,
+                        ) ,objective.text,
                     }
 
                     if objective.type == 'progressbar' then

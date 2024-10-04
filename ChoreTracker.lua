@@ -5,12 +5,23 @@ Addon:SetDefaultModuleLibraries('AceBucket-3.0', 'AceEvent-3.0')
 
 Addon.data = {
     chores = {},
+    delves = {},
     timers = {},
 }
 Addon.L = LibStub('AceLocale-3.0'):GetLocale(addonName)
 
 local ADB = LibStub('AceDB-3.0')
 local LSM = LibStub('LibSharedMedia-3.0')
+
+local DEFAULT_SECTION_ORDER = {
+    'timers',
+    'events',
+    'delves',
+    'warWithin',
+    'professions',
+    'pvp',
+    'dragonflight',
+}
 
 local defaultDb = {
     char = {
@@ -26,6 +37,14 @@ local defaultDb = {
             }
         },
         general = {
+            appearance = {
+                backgroundColor = { r = 0, g = 0, b = 0, a = 0.7 },
+                borderColor = { r = 63 / 255, g = 63 / 255, b = 63 / 255, a = 0.7 },
+                strata = 'LOW',
+            },
+            automation = {
+                acceptQuests = false,
+            },
             display = {
                 awakenedTimers = false,
                 showCompleted = false,
@@ -33,16 +52,20 @@ local defaultDb = {
                 showObjectives = 'ALL',
                 statusIcons = true,
             },
-            appearance = {
-                backgroundColor = { r = 0, g = 0, b = 0, a = 0.7 },
-                borderColor = { r = 63 / 255, g = 63 / 255, b = 63 / 255, a = 0.7 },
-                strata = 'LOW',
+            order = {
+                sections = DEFAULT_SECTION_ORDER,
             },
             text = {
                 font = LSM:GetDefault('font'),
                 fontSize = 12,
                 fontStyle = '',
-            }
+            },
+        },
+        delves = {
+            bountiful = {
+                showDelves = true,
+                showKeys = true,
+            },
         },
         window = {
             height = nil,
@@ -53,6 +76,7 @@ local defaultDb = {
             minimized = false,
         },
         desiredShown = true,
+        seenAutoAcceptMessage = false,
         chores = {},
         timers = {},
     }
@@ -66,10 +90,13 @@ function Addon:OnInitialize()
         for _, catData in ipairs(sectionData.categories or {}) do
             defaultDb.profile.chores[sectionKey][catData.key] = {}
 
+            local defaultEnabled = sectionData.defaultEnabled ~= false and
+                catData.defaultEnabled ~= false
+
             if catData.drops ~= nil then
                 local drops = {}
                 for _, dropData in ipairs(catData.drops) do
-                    drops[dropData.key] = dropData.defaultEnabled ~= false
+                    drops[dropData.key] = dropData.defaultEnabled ~= false and defaultEnabled
                 end
                 defaultDb.profile.chores[sectionKey][catData.key].drops = drops
             end
@@ -77,7 +104,7 @@ function Addon:OnInitialize()
             if catData.dungeons ~= nil then
                 local dungeons = {}
                 for _, dungeonData in ipairs(catData.dungeons) do
-                    dungeons[dungeonData.key] = dungeonData.defaultEnabled ~= false
+                    dungeons[dungeonData.key] = dungeonData.defaultEnabled ~= false and defaultEnabled
                 end
                 defaultDb.profile.chores[sectionKey][catData.key].dungeons = dungeons
             end
@@ -86,7 +113,7 @@ function Addon:OnInitialize()
                 local quests = {}
                 for _, questData in ipairs(catData.quests) do
                     if quests[questData.key] == nil then
-                        quests[questData.key] = questData.defaultEnabled ~= false
+                        quests[questData.key] = questData.defaultEnabled ~= false and defaultEnabled
                     end
                 end
                 defaultDb.profile.chores[sectionKey][catData.key].quests = quests
@@ -108,6 +135,14 @@ function Addon:OnInitialize()
 
     self.db = ADB:New('ChoreTrackerDB', defaultDb, true) -- default global profile
 
+    -- Clean up old weekly data
+    local cutoff = time() - (14 * 24 * 60 * 60)
+    for weekEnd, _ in pairs(self.db.global.questWeeks) do
+        if weekEnd < cutoff then
+            self.db.global.questWeeks[weekEnd] = nil
+        end
+    end
+
     -- register events, etc
     self:RegisterEvent('PLAYER_ENTERING_WORLD')
 end
@@ -117,6 +152,11 @@ function Addon:PLAYER_ENTERING_WORLD()
         if module.OnEnteringWorld ~= nil then
             module:OnEnteringWorld()
         end
+    end
+
+    if not Addon.db.global.seenAutoAcceptMessage then
+        C_Timer.After(5, function() print(Addon.L['auto_accept_message']) end)
+        Addon.db.global.seenAutoAcceptMessage = true
     end
 end
 

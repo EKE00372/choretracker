@@ -1,5 +1,10 @@
 local L = LibStub('AceLocale-3.0'):NewLocale('ChoreTracker', 'zhTW')
-if not L then return end
+if not L then return end -- don't remove this!
+
+L['section:dragonflight'] = EXPANSION_NAME9
+L['section:warWithin'] = EXPANSION_NAME10
+
+L['auto_accept_message'] = 'ChoreTracker is able to auto-accept some quests from the Suggested Content window, you can enable this in Options/General (one-time message)'
 
 L['key_binding:toggle'] = '切換 ChoreTracker 視窗'
 
@@ -24,6 +29,7 @@ L['option:text:font'] = '字型'
 L['option:text:fontSize'] = '字型大小'
 L['option:text:fontStyle'] = '字型樣式'
 
+L['section:general'] = '通用'
 L['section:chores'] = '事項'
 L['section:drops'] = '掉落'
 L['section:events'] = '事件'
@@ -31,12 +37,14 @@ L['section:professions'] = '專業'
 L['section:quests'] = '任務'
 L['section:timers'] = '時間'
 
+L['category:brawls'] = '亂鬥'
 L['category:catchAndRelease'] = '補後放生'
 L['category:dailies'] = '每日任務'
 L['category:event'] = '事件'
 L['category:holidays'] = '每周活動'
 L['category:holidays2'] = '節日'
 L['category:limited'] = '限時活動'
+L['category:darkmoonFaire'] = '暗月馬戲團'
 L['category:patch_10_0_0'] = 'Patch 10.0.0'
 L['category:patch_10_0_5'] = 'Patch 10.0.5'
 L['category:patch_10_0_7'] = 'Patch 10.0.7'
@@ -46,14 +54,12 @@ L['category:patch_10_1_7'] = 'Patch 10.1.7'
 L['category:patch_10_2_0'] = 'Patch 10.2.0'
 L['category:patch_10_2_5'] = 'Patch 10.2.5'
 L['category:patch_11_0_0'] = 'Patch 11.0.0'
-L['category:pvpBrawls'] = 'PvP 亂鬥'
 L['category:worldBosses'] = '世界首領'
 
 L['chore:warWithin:patch_11_0_0:quests:awakeningTheMachine'] = '甦醒機械'
 L['chore:warWithin:patch_11_0_0:quests:delveKeys'] = '探究鑰匙'
 L['chore:warWithin:patch_11_0_0:quests:dungeon'] = '地下城'
 L['chore:warWithin:patch_11_0_0:quests:rollinDown'] = "滾入深處"
-L['chore:warWithin:patch_11_0_0:quests:sparksOfWar'] = '戰爭火花'
 L['chore:warWithin:patch_11_0_0:quests:spiderPact'] = '蜘蛛合約'
 L['chore:warWithin:patch_11_0_0:quests:spiderWeekly'] = '蜘蛛每周'
 L['chore:warWithin:patch_11_0_0:quests:spreadingTheLight'] = '散布光芒'
@@ -99,8 +105,6 @@ L['chore:dragonflight:patch_10_0_0:quests:grandHuntEpic'] = '大狩獵：史詩'
 L['chore:dragonflight:patch_10_0_0:quests:heroicDungeons'] = '英雄地城'
 L['chore:dragonflight:patch_10_0_0:quests:showYourMettle'] = '展現你的精神'
 
-L['chore:events:holidays:quests:arenaSkirmishes'] = '競技場練習戰'
-L['chore:events:holidays:quests:battlegrounds'] = '戰場'
 L['chore:events:holidays:quests:mythicDungeons'] = '傳奇地城'
 L['chore:events:holidays:quests:pvpPetBattles'] = '戰寵 PvP'
 L['chore:events:holidays:quests:timewalkingDungeons'] = '時光漫遊地城'
@@ -113,19 +117,6 @@ L['chore:events:holidays2:dungeons:crownChemicalCo'] = '王冠化學製藥公司
 L['chore:events:holidays2:dungeons:headlessHorseman'] = '無頭騎士'
 L['chore:events:holidays2:dungeons:frostLordAhune'] = '冰霜領主艾胡恩'
 L['chore:events:holidays2:quests:meanOne'] = '被偷走的禮物'
-
-L['chore:events:pvpBrawls:quests:arathiBlizzard'] = '阿拉希暴風雪'
-L['chore:events:pvpBrawls:quests:classicAshran'] = '經典艾斯蘭'
-L['chore:events:pvpBrawls:quests:compStomp'] = '阿拉希對抗電腦'
-L['chore:events:pvpBrawls:quests:cookingImpossible'] = '不可能的飪物'
-L['chore:events:pvpBrawls:quests:deepSix'] = '六人對戰'
-L['chore:events:pvpBrawls:quests:deepwindDunk'] = '深風峽谷籃球賽'
-L['chore:events:pvpBrawls:quests:gravityLapse'] = '重力流逝'
-L['chore:events:pvpBrawls:quests:packedHouse'] = '座無虛席'
-L['chore:events:pvpBrawls:quests:shadoPanShowdown'] = '影潘決戰場'
-L['chore:events:pvpBrawls:quests:southshoreVsTarrenMill'] = '南海鎮大戰塔倫米爾'
-L['chore:events:pvpBrawls:quests:templeOfHotmogu'] = '熱力魔古神廟'
-L['chore:events:pvpBrawls:quests:warsongScramble'] = '戰歌大亂鬥'
 
 L['chore:professions:warWithin:drops:gather'] = '採集'
 L['chore:professions:warWithin:drops:mob/treasure'] = '怪物/寶藏'
@@ -149,6 +140,23 @@ L['chore:professions:dragonflight:quests:skinVerdantGladewarden'] = 'Skin Verdan
 
 L['chore:professions:event:quests:darkmoonFaire'] = '暗月馬戲團'
 
+L['chore:pvp:brawls:quests:arathiBlizzard'] = '阿拉希暴風雪'
+L['chore:pvp:brawls:quests:classicAshran'] = '經典艾斯蘭'
+L['chore:pvp:brawls:quests:compStomp'] = '阿拉希對抗電腦'
+L['chore:pvp:brawls:quests:cookingImpossible'] = '不可能的飪物'
+L['chore:pvp:brawls:quests:deepSix'] = '六人對戰'
+L['chore:pvp:brawls:quests:deepwindDunk'] = '深風峽谷籃球賽'
+L['chore:pvp:brawls:quests:gravityLapse'] = '重力流逝'
+L['chore:pvp:brawls:quests:packedHouse'] = '座無虛席'
+L['chore:pvp:brawls:quests:shadoPanShowdown'] = '影潘決戰場'
+L['chore:pvp:brawls:quests:southshoreVsTarrenMill'] = '南海鎮大戰塔倫米爾'
+L['chore:pvp:brawls:quests:templeOfHotmogu'] = '熱力魔古神廟'
+L['chore:pvp:brawls:quests:warsongScramble'] = '戰歌大亂鬥'
+
+L['chore:pvp:weekly:quests:arenaSkirmishes'] = '競技場練習戰'
+L['chore:pvp:weekly:quests:battlegrounds'] = '戰場'
+L['chore:pvp:weekly:quests:sparks'] = '戰爭火花'
+
 L['timer:beledarsShadow'] = "巴雷達爾之影"
 L['timer:theaterTroupe'] = '劇團'
 
@@ -163,9 +171,19 @@ L['timer:timeRift'] = '時間裂隙'
 L['objective:defeat_x'] = '擊敗 %s'
 
 L['choose_quest'] = '選擇一個任務！'
+L['objective:bring_x'] = '預先攜帶 %s個 %s'
 
 L['questName:80544'] = '絲織者'
 L['questName:80545'] = '將軍'
 L['questName:80546'] = '輔臣'
 
 L['missing_skill_level'] = '|cFFFF00FF打開專業視窗！|r'
+
+-- Auto-Accept
+L['autoAccept:choresEvents:holidays:delves'] = '^獎勵事件：探究$'
+L['autoAccept:choresEvents:holidays:mythicDungeons'] = '^獎勵事件：地城$'
+L['autoAccept:choresEvents:holidays:worldQuests'] = '^獎勵事件：世界任務$'
+L['autoAccept:choresPvp:weekly:battlegrounds'] = '^獎勵事件：戰場$'
+L['autoAccept:choresPvp:weekly:sparks'] = '^戰爭火花：'
+L['autoAccept:choresWarWithin:patch_11_0_0:dungeon'] = '^多恩諾加的畢爾果絲希望你'
+L['autoAccept:choresWarWithin:patch_11_0_0:theaterTroupe'] = '^劇團$'

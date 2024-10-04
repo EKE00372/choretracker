@@ -3,6 +3,7 @@ local L = Addon.L
 local Module = Addon:NewModule(
     'Display',
     {
+        delvesEnabled = false,
         dontShow = false,
         enabledTimers = {},
         itemCache = {},
@@ -23,6 +24,7 @@ BINDING_NAME_CHORETRACKER_TOGGLE = Addon.L['key_binding:toggle']
 
 local CC_GetDayEvent = C_Calendar.GetDayEvent
 local CC_GetNumDayEvents = C_Calendar.GetNumDayEvents
+local CCI_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local CDAT_CompareCalendarTime = C_DateAndTime.CompareCalendarTime
 local CDAT_GetCalendarTimeFromEpoch = C_DateAndTime.GetCalendarTimeFromEpoch
 local CDAT_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
@@ -30,6 +32,30 @@ local CDAT_GetSecondsUntilWeeklyReset = C_DateAndTime.GetSecondsUntilWeeklyReset
 local CMI_GetModifiedInstanceInfoFromMapID = C_ModifiedInstance.GetModifiedInstanceInfoFromMapID
 
 local OBJECTIVE_DEFEAT_X = Addon.L['objective:defeat_x']
+local OBJECTIVE_BRING_X = Addon.L['objective:bring_x']
+
+local SECTION_TO_CATEGORIES = {
+    dragonflight = { 'choresDragonflight' },
+    events = { 'choresEvents' },
+    pvp = { 'choresPvp' },
+    warWithin = { 'choresWarWithin' },
+    professions = {
+        'professionAlchemy',
+        'professionBlacksmithing',
+        'professionEnchanting',
+        'professionEngineering',
+        'professionHerbalism',
+        'professionInscription',
+        'professionJewelcrafting',
+        'professionLeatherworking',
+        'professionMining',
+        'professionSkinning',
+        'professionTailoring',
+        'professionArchaeology',
+        'professionCooking',
+        'professionFishing',
+    },
+}
 
 local REGION_OFFSET = {
     [1] = -(7 * 60 * 60), -- US events use PST (-0700 UTC)
@@ -47,6 +73,7 @@ local STATUS_ICON = {
     [1] = '|TInterface\\Addons\\ChoreTracker\\Assets\\status_1.tga:0|t',
     [2] = '|TInterface\\Addons\\ChoreTracker\\Assets\\status_2.tga:0|t',
 }
+local KEY_ICON = '|T4622270:0|t'
 
 function Module:OnEnable()
     ScannerModule = Addon:GetModule('Scanner')
@@ -202,6 +229,9 @@ function Module:ConfigChanged()
 
     local playerLevel = UnitLevel('player')
 
+    -- Delves
+    self.delvesEnabled = playerLevel == 80
+
     -- Events
     self.sections = {}
     for _, sectionTemp in ipairs(self.sortedSections) do
@@ -287,7 +317,7 @@ function Module:ConfigChanged()
             end
         end
     end
-    
+
     -- Timers
     wipe(self.enabledTimers)
     for _, category in pairs(Addon.data.timers) do
@@ -328,8 +358,170 @@ function Module:Redraw(changed)
 
     -- local started = debugprofilestop()
 
+    local categories = self:GetSections()
+    local categoryMap = {}
+    for _, category in ipairs(categories) do
+        categoryMap[category.key] = category
+    end
+
     local newChildren = {}
     local seenFrames = {}
+
+    for _, section in ipairs(Addon.db.profile.general.order.sections) do
+        if section == 'timers' then
+            self:AddTimers(changed, newChildren, seenFrames)
+        elseif section == 'delves' then
+            self:AddDelves(changed, newChildren, seenFrames)
+            -- elseif section == 'events' then
+        else
+            local sectionCategories = SECTION_TO_CATEGORIES[section] or {}
+            for _, sectionCategory in ipairs(sectionCategories) do
+                local categoryData = categoryMap[sectionCategory]
+                if categoryData ~= nil then
+                    self:AddChores(changed, newChildren, seenFrames, categoryData)
+                end
+            end
+        end
+    end
+
+    -- Release any unused frames
+    for key, sectionFrame in pairs(self.sectionFrames) do
+        if seenFrames[key] ~= true then
+            AceGUI:Release(sectionFrame)
+            self.sectionFrames[key] = nil
+        end
+    end
+
+    self.scrollFrame.children = newChildren
+    self.scrollFrame:DoLayout()
+
+    -- local ended = debugprofilestop()
+    -- print('redraw took ' .. (ended - started) .. 'ms')
+    
+    self.haveDrawn = true
+end
+
+function Module:GetSectionFrame(key)
+    local sectionFrame = self.sectionFrames[key]
+    if sectionFrame == nil then
+        sectionFrame = AceGUI:Create('SimpleGroup')
+        sectionFrame:SetParent(self.scrollFrame)
+        sectionFrame:SetLayout('FancyList')
+        sectionFrame:SetFullWidth(true)
+
+        sectionFrame.__key = key
+        sectionFrame.content.spacing = 4
+        
+        self.sectionFrames[key] = sectionFrame
+    end
+
+    return sectionFrame
+end
+
+function Module:AddChores(changed, newChildren, seenFrames, category)
+    local frameKey = 'category:' .. category.key
+    local catFrame = self:GetSectionFrame(frameKey)
+
+    if changed == nil or changed.quests ~= nil then
+        catFrame:ReleaseChildren()
+
+        local prefix = self:GetPercentColor(category.completed, category.total)
+        local headerText = category.header .. ' - ' .. prefix .. category.completed ..
+            '|r|cFF888888/|r' .. prefix .. category.total .. '|r'
+        self:AddLine(catFrame, headerText, Addon.db.profile.general.text.fontSize + 1)
+
+        for _, entry in ipairs(category.entries) do
+            self:AddLine(catFrame, entry)
+        end
+    end
+
+    table.insert(newChildren, catFrame)
+    seenFrames[frameKey] = true
+end
+
+function Module:AddDelves(changed, newChildren, seenFrames)
+    if self.delvesEnabled and Addon.db.profile.delves.bountiful.showDelves then
+        local delvesFrame = self:GetSectionFrame('delves')
+    
+        if changed == nil or changed.pois ~= nil then
+            delvesFrame:ReleaseChildren()
+
+            local showCompletedSections = Addon.db.profile.general.display.showCompletedSections
+            local showCompletedChores = Addon.db.profile.general.display.showCompleted
+            local showKeys = Addon.db.profile.delves.bountiful.showKeys
+            local showStatusIcons = Addon.db.profile.general.display.statusIcons
+
+            local completed = 0
+            local total = 0
+            local labelTexts = {}
+            for _, sectionData in pairs(Addon.data.delves) do
+                for _, mapData in ipairs(sectionData.zones) do
+                    local mapInfo = C_Map.GetMapInfo(mapData.uiMapId)
+                    for _, poi in ipairs(mapData.pois) do
+                        local labelText
+                        local status = -1
+
+                        local poiData = ScannerModule.pois[poi.active]
+                        if poiData ~= nil then
+                            -- available
+                            labelText = STATUS_COLOR[0] .. mapInfo.name .. '|r: ' .. poiData.name
+                            total = total + 1
+                            status = 0
+                        else
+                            poiData = ScannerModule.pois[poi.inactive]
+                            local quest = ScannerModule.quests[poi.quest]
+                            if quest ~= nil and quest.status == 2 then
+                                total = total + 1
+                                completed = completed + 1
+                                status = 2
+
+                                if showCompletedChores then
+                                    labelText = STATUS_COLOR[2] .. mapInfo.name .. '|r: ' .. poiData.name
+                                end
+                            end
+                        end
+                    
+                        if labelText ~= nil then
+                            local finalText = '- '
+
+                            if showStatusIcons == true then
+                                finalText = finalText .. STATUS_ICON[status] .. ' '
+                            end
+                            
+                            finalText = finalText .. labelText
+
+                            tinsert(labelTexts, finalText)
+                        end
+                    end
+                end
+            end
+            
+            if completed < total or showCompletedSections then
+                local prefix = self:GetPercentColor(completed, total)
+
+                local headerText = L['category:bountifulDelves']
+                if showKeys then
+                    local keyCount = CCI_GetCurrencyInfo(3028).quantity
+                    local keyColor = self:GetPercentColor(keyCount, total - completed)
+                    headerText = headerText .. ' |cFF888888[|r' .. keyColor .. keyCount .. '|r ' .. KEY_ICON .. '|cFF888888]|r'
+                end
+                headerText = headerText .. ' - ' .. prefix .. completed .. '|r|cFF888888/|r' .. prefix ..
+                    total .. '|r'
+
+                self:AddLine(delvesFrame, headerText, Addon.db.profile.general.text.fontSize + 1)
+
+                for _, labelText in ipairs(labelTexts) do
+                    self:AddLine(delvesFrame, labelText)
+                end
+            end
+        end
+
+        table.insert(newChildren, delvesFrame)
+        seenFrames.delves = true
+    end
+end
+
+function Module:AddTimers(changed, newChildren, seenFrames)
 
     -- Timers
     if #self.enabledTimers > 0 then
@@ -370,62 +562,6 @@ function Module:Redraw(changed)
         table.insert(newChildren, timerFrame)
         seenFrames.timers = true
     end
-
-    -- Get categories and add them
-    local categories = self:GetSections()
-    for _, category in ipairs(categories) do
-        local frameKey = 'category:' .. category.key
-        local catFrame = self:GetSectionFrame(frameKey)
-
-        if changed == nil or changed.quests ~= nil then
-            catFrame:ReleaseChildren()
-
-            local prefix = self:GetPercentColor(category.completed, category.total)
-            local headerText = category.header .. ' - ' .. prefix .. category.completed ..
-                '|r|cFF888888/|r' .. prefix .. category.total .. '|r'
-            self:AddLine(catFrame, headerText, Addon.db.profile.general.text.fontSize + 1)
-
-            for _, entry in ipairs(category.entries) do
-                self:AddLine(catFrame, entry)
-            end
-        end
-
-        table.insert(newChildren, catFrame)
-        seenFrames[frameKey] = true
-    end
-
-    -- Release any unused frames
-    for key, sectionFrame in pairs(self.sectionFrames) do
-        if seenFrames[key] ~= true then
-            AceGUI:Release(sectionFrame)
-            self.sectionFrames[key] = nil
-        end
-    end
-
-    self.scrollFrame.children = newChildren
-    self.scrollFrame:DoLayout()
-
-    -- local ended = debugprofilestop()
-    -- print('redraw took ' .. (ended - started) .. 'ms')
-    
-    self.haveDrawn = true
-end
-
-function Module:GetSectionFrame(key)
-    local sectionFrame = self.sectionFrames[key]
-    if sectionFrame == nil then
-        sectionFrame = AceGUI:Create('SimpleGroup')
-        sectionFrame:SetParent(self.scrollFrame)
-        sectionFrame:SetLayout('FancyList')
-        sectionFrame:SetFullWidth(true)
-
-        sectionFrame.__key = key
-        sectionFrame.content.spacing = 4
-        
-        self.sectionFrames[key] = sectionFrame
-    end
-
-    return sectionFrame
 end
 
 function Module:GetSections()
@@ -441,6 +577,7 @@ function Module:GetSections()
         section.completed = 0
         section.total = 0
         section.entries = {}
+        section.usedQuests = {}
 
         for _, chore in ipairs(section.chores) do
             if chore.typeKey == 'warning' then
@@ -557,13 +694,22 @@ function Module:GetSectionQuests(week, section, chore, showCompleted, showObject
     }
 
     for _, choreEntry in ipairs(chore.data.entries or {}) do
-        local entryState = ScannerModule.quests[choreEntry.quest]
-        if entryState ~= nil then
-            table.insert(byStatus[entryState.status], {
-                choreEntry,
-                entryState,
-                week[choreEntry.quest],
-            })
+        local questIds = { choreEntry.quest }
+        if choreEntry.actualQuest then tinsert(questIds, choreEntry.actualQuest) end
+        if choreEntry.unlockQuest then tinsert(questIds, choreEntry.unlockQuest) end
+        
+        for index, questId in ipairs(questIds) do
+            local entryState = ScannerModule.quests[questId]
+            if entryState ~= nil and
+                (entryState.status > 0 or index == #questIds)
+            then
+                table.insert(byStatus[entryState.status], {
+                    choreEntry,
+                    entryState,
+                    week[questId],
+                })
+                break
+            end
         end
     end
 
@@ -612,15 +758,21 @@ function Module:GetSectionQuests(week, section, chore, showCompleted, showObject
                             end
                         end
 
-                        local shoppingText = '    * Bring ' .. bringMe[1] .. 'x ' .. bringName .. '|r'
+                        local shoppingText = '    * ' .. string.format(OBJECTIVE_BRING_X, bringMe[1], bringName) .. '|r'
                         table.insert(section.entries, shoppingText)
                     end
                 elseif bestState.status == 1 then
-                    if bestState.objectives ~= nil and #bestState.objectives > 1 then
+                    if bestState.objectives ~= nil and
+                        (#bestState.objectives > 1 or chore.data.alwaysShowObjectives)
+                    then
                         self:AddObjectives(section.entries, bestState.objectives, showObjectives)
-                    elseif bestWeek ~= nil and bestWeek.objectives ~= nil and #bestWeek.objectives > 1 then
+                    elseif bestWeek ~= nil and bestWeek.objectives ~= nil and
+                        (#bestWeek.objectives > 1 or chore.data.alwaysShowObjectives) then
                         self:AddObjectives(section.entries, bestWeek.objectives, showObjectives)
                     end
+                elseif bestWeek ~= nil and bestWeek.objectives ~= nil and
+                    (#bestWeek.objectives > 1 or chore.data.alwaysShowObjectives) then
+                    self:AddObjectives(section.entries, bestWeek.objectives, showObjectives)
                 end
             end
         end
@@ -632,15 +784,23 @@ function Module:AddObjectives(entries, objectives, showObjectives)
 
     for _, objective in ipairs(objectives) do
         local objText
+        local showThis = showObjectives == 'ALL' or objective.have < objective.need
 
         if objective.type == 'item' or
             objective.type == 'monster' or
-            objective.type == 'object' or
-            objective.type == 'progressbar'
+            objective.type == 'object'
         then
-            if showObjectives == 'ALL' or objective.have < objective.need then
+            if showThis then
                 objText = '    * ' ..
                     self:GetPercentColor(objective.have, objective.need) ..
+                    objective.text
+            end
+        elseif objective.type == 'progressbar' then
+            if showThis then
+                objText = '    * ' ..
+                    self:GetPercentColor(objective.have, objective.need) ..
+                    objective.have ..
+                    '% ' ..
                     objective.text
             end
         else
@@ -669,7 +829,7 @@ end
 
 function Module:GetEntryText(translated, entry, state, weekState, options)
     -- options = { inProgressQuestName, useShoppingListAsName }
-    local questName = QuestUtils_GetQuestName(entry.quest)
+    local questName = QuestUtils_GetQuestName(entry.actualQuest or entry.quest)
     if questName == nil or questName == '' then
         if entry.encounter then
             local _, name = EJ_GetCreatureInfo(entry.encounter[2], entry.encounter[1])
@@ -677,18 +837,20 @@ function Module:GetEntryText(translated, entry, state, weekState, options)
         else
             -- This will just return the key if there's no translation entry, check for that
             local translatedName = L['questName:' .. entry.quest]
-            if translatedName:find('^questName') == nil then
+            if translatedName:find('^questName:') == nil then
                 questName = translatedName
             else
                 questName = '???'
             end
         end
+    elseif options.removeText then
+        questName = questName:gsub(options.removeText, '')
     end
 
     local thingString = ''
-    if state.status == 1 and options.alwaysQuestName then
+    if state.status <= 1 and options.alwaysQuestName then
         thingString = '|cFFFFFFFF' .. questName
-    elseif state.status == 1 and state.objectives ~= nil and #state.objectives == 1 then
+    elseif state.status == 1 and state.objectives ~= nil and #state.objectives == 1 and not options.alwaysShowObjectives then
         local objective = state.objectives[1]
         thingString = self:GetPercentColor(objective.have, objective.need, true) .. objective.text
     elseif entry.item ~= nil then
@@ -740,9 +902,15 @@ function Module:GetEntryText(translated, entry, state, weekState, options)
         final = final .. STATUS_ICON[state.status] .. ' '
     end
 
+    if options.dailyQuest then
+        final = final .. '|cFF00CFFF[D] '
+    end
+
     final = final .. STATUS_COLOR[state.status]
 
-    if not (options.inProgressQuestName == false and state.status == 1) then
+    if not (options.inProgressQuestName == false and state.status == 1) and
+        not (options.onlyItemName == true and entry.item ~= nil)
+    then
         final = final .. translated .. '|r: '
     end
 

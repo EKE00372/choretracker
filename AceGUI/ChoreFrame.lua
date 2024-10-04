@@ -114,6 +114,7 @@ do
     local function OnAcquire(self)
         self.frame:SetParent(UIParent)
         self.frame:SetFrameStrata('LOW')
+        self.frame:SetClampedToScreen(true)
         self:ApplyStatus()
         self:EnableResize(true)
         self:Show()
@@ -173,12 +174,18 @@ do
             self.content:Show()
 
             if status.locked then
-                setLockedTexture(self)
                 self.resizeButton:Hide()
             else
-                setUnlockedTexture(self)
                 self.resizeButton:Show()
             end
+        end
+
+        if status.locked then
+            self.frame:EnableMouse(false)
+            setLockedTexture(self)
+        else
+            self.frame:EnableMouse(true)
+            setUnlockedTexture(self)
         end
     end
 
@@ -234,16 +241,15 @@ do
         frame:SetWidth(1)
         frame:SetHeight(1)
         frame:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
-        frame:EnableMouse()
+        frame:EnableMouse(true)
         frame:SetMovable(true)
         frame:SetResizable(true)
         -- frame:SetFrameStrata('BACKGROUND')
         frame:SetScript('OnMouseDown', frameOnMouseDown)
         frame:SetScript('OnMouseUp', frameOnMouseUp)
-
         frame:SetScript('OnShow', frameOnShow)
         frame:SetScript('OnHide', frameOnClose)
-        frame:SetResizeBounds(200, 150)
+        frame:SetResizeBounds(200, 100)
         -- frame:SetToplevel(true)
 
         frame:SetBackdrop({

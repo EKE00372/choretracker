@@ -1,11 +1,24 @@
 local L = LibStub('AceLocale-3.0'):NewLocale('ChoreTracker', 'enUS', true, true)
 
+L['section:dragonflight'] = EXPANSION_NAME9
+L['section:warWithin'] = EXPANSION_NAME10
+
+L['auto_accept_message'] = 'ChoreTracker is now able to auto-accept some quests from the Suggested Content window, you can enable this in Options/General (one-time message)'
+
 L['key_binding:toggle'] = 'Toggle ChoreTracker window'
 
 L['option:appearance'] = 'Appearance'
 L['option:appearance:backgroundColor'] = 'Background color'
 L['option:appearance:borderColor'] = 'Border color'
 L['option:appearance:strata'] = 'Strata'
+
+L['option:automation'] = 'Automation'
+L['option:automation:acceptQuests'] = 'Auto-Start Quests'
+L['option:automation:acceptQuests:desc'] = 'Try to automatically start quests from the Adventure Journal'
+
+L['option:bountifulDelves'] = 'Bountiful Delves'
+L['option:bountifulDelves:showDelves'] = 'Show Delves'
+L['option:bountifulDelves:showKeys'] = 'Show Keys'
 
 L['option:bulkActions'] = 'Bulk Actions'
 L['option:bulkActions:dragonflightDisable'] = 'Disable ALL DF chores'
@@ -18,24 +31,32 @@ L['option:display:showCompleted'] = 'Show completed chores'
 L['option:display:showObjectives'] = 'Show chore objectives'
 L['option:display:statusIcons'] = 'Use status icons'
 
+L['option:sectionOrder'] = 'Section Order'
+
 L['option:text'] = 'Text'
 L['option:text:font'] = 'Font'
 L['option:text:fontSize'] = 'Font size'
 L['option:text:fontStyle'] = 'Font style'
 
+L['section:general'] = 'General'
 L['section:chores'] = 'Chores'
+L['section:delves'] = 'Delves'
 L['section:drops'] = 'Drops'
 L['section:events'] = 'Events'
 L['section:professions'] = 'Professions'
+L['section:pvp'] = 'PvP'
 L['section:quests'] = 'Quests'
 L['section:timers'] = 'Timers'
 
+L['category:bountifulDelves'] = 'Bountiful Delves'
+L['category:brawls'] = 'Brawls'
 L['category:catchAndRelease'] = 'Catch and Release'
 L['category:dailies'] = 'Dailies'
 L['category:event'] = 'Event'
 L['category:holidays'] = 'Weekly Holidays'
 L['category:holidays2'] = 'Holidays'
 L['category:limited'] = 'Limited Time'
+L['category:darkmoonFaire'] = 'Darkmoon Faire'
 L['category:patch_10_0_0'] = 'Patch 10.0.0'
 L['category:patch_10_0_5'] = 'Patch 10.0.5'
 L['category:patch_10_0_7'] = 'Patch 10.0.7'
@@ -45,19 +66,22 @@ L['category:patch_10_1_7'] = 'Patch 10.1.7'
 L['category:patch_10_2_0'] = 'Patch 10.2.0'
 L['category:patch_10_2_5'] = 'Patch 10.2.5'
 L['category:patch_11_0_0'] = 'Patch 11.0.0'
-L['category:pvpBrawls'] = 'PvP Brawls'
+L['category:weekly'] = 'Weekly'
 L['category:worldBosses'] = 'World Bosses'
 
 L['chore:warWithin:patch_11_0_0:quests:awakeningTheMachine'] = 'Awakening the Machine'
 L['chore:warWithin:patch_11_0_0:quests:delveKeys'] = 'Delve Keys'
 L['chore:warWithin:patch_11_0_0:quests:dungeon'] = 'Dungeon'
+L['chore:warWithin:patch_11_0_0:quests:emissaryArchives'] = 'Archives?'
+L['chore:warWithin:patch_11_0_0:quests:emissaryDelves'] = 'Delves?'
+L['chore:warWithin:patch_11_0_0:quests:emissaryWorldsoul'] = 'Worldsoul?'
 L['chore:warWithin:patch_11_0_0:quests:rollinDown'] = "Rollin' Down in the Deeps"
-L['chore:warWithin:patch_11_0_0:quests:sparksOfWar'] = 'Sparks of War'
+L['chore:warWithin:patch_11_0_0:quests:specialAssignment'] = 'Special Assignment'
 L['chore:warWithin:patch_11_0_0:quests:spiderPact'] = 'Spider Pact'
 L['chore:warWithin:patch_11_0_0:quests:spiderWeekly'] = 'Spider Weekly'
 L['chore:warWithin:patch_11_0_0:quests:spreadingTheLight'] = 'Spreading the Light'
 L['chore:warWithin:patch_11_0_0:quests:theaterTroupe'] = 'Theater Troupe'
-L['chore:warWithin:patch_11_0_0:quests:worldsoul'] = 'Worldsoul'
+L['chore:warWithin:patch_11_0_0:quests:worldBoss'] = 'World Boss'
 
 L['chore:dragonflight:catchAndRelease:quests:releaseAileron'] = 'Aileron Seamoth'
 L['chore:dragonflight:catchAndRelease:quests:releaseCerulean'] = 'Cerulean Spinefish'
@@ -98,8 +122,29 @@ L['chore:dragonflight:patch_10_0_0:quests:grandHuntEpic'] = 'Grand Hunt: Epic'
 L['chore:dragonflight:patch_10_0_0:quests:heroicDungeons'] = 'Heroic Dungeons'
 L['chore:dragonflight:patch_10_0_0:quests:showYourMettle'] = 'Show Your Mettle'
 
-L['chore:events:holidays:quests:arenaSkirmishes'] = 'Arena Skirmishes'
-L['chore:events:holidays:quests:battlegrounds'] = 'Battlegrounds'
+L['chore:events:darkmoonFaire:quests:gameHammerTime'] = 'Game: Whack-a-Gnoll'
+L['chore:events:darkmoonFaire:quests:gameHumanoidCannonball'] = 'Game: Darkmoon Cannon'
+L['chore:events:darkmoonFaire:quests:gameHeShootsHeScores'] = 'Game: Shooting Gallery'
+L['chore:events:darkmoonFaire:quests:gameTonkCommander'] = 'Game: Tonk Challenge'
+L['chore:events:darkmoonFaire:quests:gameTargetTurtle'] = 'Game: Ring Toss'
+L['chore:events:darkmoonFaire:quests:gameFirebirdsChallenge'] = "Game: Firebird's Challenge"
+L['chore:events:darkmoonFaire:quests:race'] = 'The Real Race'
+L['chore:events:darkmoonFaire:quests:bigRace'] = 'The Real Big Race'
+L['chore:events:darkmoonFaire:quests:petBattleJeremy'] = 'Battle Jeremy'
+L['chore:events:darkmoonFaire:quests:petBattleChristoph'] = 'Battle Christoph'
+L['chore:events:darkmoonFaire:quests:testYourStrength'] = 'Test Your Strength'
+L['chore:events:darkmoonFaire:quests:denMother'] = 'Kill Moonfang'
+L['chore:events:darkmoonFaire:quests:aTreatiseOnStrategy'] = 'Item: A Treatise on Strategy'
+L['chore:events:darkmoonFaire:quests:bannerOfTheFallen'] = 'Item: Banner of the Fallen'
+L['chore:events:darkmoonFaire:quests:capturedInsignia'] = 'Item: Captured Insignia'
+L['chore:events:darkmoonFaire:quests:fallenAdventurersJournal'] = "Item: Adventurer's Journal"
+L['chore:events:darkmoonFaire:quests:imbuedCrystal'] = 'Item: Imbued Crystal'
+L['chore:events:darkmoonFaire:quests:monstrousEgg'] = 'Item: Monstrous Egg'
+L['chore:events:darkmoonFaire:quests:mysteriousGrimoire'] = 'Item: Mysterious Grimoire'
+L['chore:events:darkmoonFaire:quests:ornateWeapon'] = 'Item: Ornate Weapon'
+L['chore:events:darkmoonFaire:quests:soothsayersRunes'] = "Item: Soothsayer's Runes"
+
+L['chore:events:holidays:quests:delves'] = 'Delves'
 L['chore:events:holidays:quests:mythicDungeons'] = 'Mythic Dungeons'
 L['chore:events:holidays:quests:pvpPetBattles'] = 'PvP Pet Battles'
 L['chore:events:holidays:quests:timewalkingDungeons'] = 'Timewalking Dungeons'
@@ -113,25 +158,13 @@ L['chore:events:holidays2:dungeons:headlessHorseman'] = 'Headless Horseman'
 L['chore:events:holidays2:dungeons:frostLordAhune'] = 'Frost Lord Ahune'
 L['chore:events:holidays2:quests:meanOne'] = 'Stolen Treats'
 
-L['chore:events:pvpBrawls:quests:arathiBlizzard'] = 'Arathi Blizzard'
-L['chore:events:pvpBrawls:quests:classicAshran'] = 'Classic Ashran'
-L['chore:events:pvpBrawls:quests:compStomp'] = 'Comp Stomp'
-L['chore:events:pvpBrawls:quests:cookingImpossible'] = 'Cooking Impossible'
-L['chore:events:pvpBrawls:quests:deepSix'] = 'Deep Six'
-L['chore:events:pvpBrawls:quests:deepwindDunk'] = 'Deepwind Dunk'
-L['chore:events:pvpBrawls:quests:gravityLapse'] = 'Gravity Lapse'
-L['chore:events:pvpBrawls:quests:packedHouse'] = 'Packed House'
-L['chore:events:pvpBrawls:quests:shadoPanShowdown'] = 'Shado-Pan Showdown'
-L['chore:events:pvpBrawls:quests:southshoreVsTarrenMill'] = 'Southshore vs. Tarren Mill'
-L['chore:events:pvpBrawls:quests:templeOfHotmogu'] = 'Temple of Hotmogu'
-L['chore:events:pvpBrawls:quests:warsongScramble'] = 'Warsong Scramble'
-
 L['chore:professions:warWithin:drops:gather'] = 'Gather'
 L['chore:professions:warWithin:drops:mob/treasure'] = 'Mobs/Treasures'
 
 L['chore:professions:warWithin:quests:orders'] = 'Orders'
 L['chore:professions:warWithin:quests:task'] = 'Task'
 L['chore:professions:warWithin:quests:treatise'] = 'Treatise'
+L['chore:professions:warWithin:quests:skinSlatefang'] = 'Skin Slatefang'
 
 L['chore:professions:dragonflight:drops:forbiddenReach'] = 'Forbidden Reach'
 L['chore:professions:dragonflight:drops:gather'] = 'Gather'
@@ -148,6 +181,24 @@ L['chore:professions:dragonflight:quests:skinVerdantGladewarden'] = 'Skin Verdan
 
 L['chore:professions:event:quests:darkmoonFaire'] = 'Darkmoon Faire'
 
+L['chore:pvp:brawls:quests:arathiBlizzard'] = 'Arathi Blizzard'
+L['chore:pvp:brawls:quests:classicAshran'] = 'Classic Ashran'
+L['chore:pvp:brawls:quests:compStomp'] = 'Comp Stomp'
+L['chore:pvp:brawls:quests:cookingImpossible'] = 'Cooking Impossible'
+L['chore:pvp:brawls:quests:deepSix'] = 'Deep Six'
+L['chore:pvp:brawls:quests:deepwindDunk'] = 'Deepwind Dunk'
+L['chore:pvp:brawls:quests:gravityLapse'] = 'Gravity Lapse'
+L['chore:pvp:brawls:quests:packedHouse'] = 'Packed House'
+L['chore:pvp:brawls:quests:shadoPanShowdown'] = 'Shado-Pan Showdown'
+L['chore:pvp:brawls:quests:southshoreVsTarrenMill'] = 'Southshore vs. Tarren Mill'
+L['chore:pvp:brawls:quests:templeOfHotmogu'] = 'Temple of Hotmogu'
+L['chore:pvp:brawls:quests:warsongScramble'] = 'Warsong Scramble'
+
+L['chore:pvp:weekly:quests:arenaSkirmishes'] = 'Arena Skirmishes'
+L['chore:pvp:weekly:quests:battlegrounds'] = 'Battlegrounds'
+L['chore:pvp:weekly:quests:preserving'] = 'Preserving'
+L['chore:pvp:weekly:quests:sparks'] = 'Sparks of War'
+
 L['timer:beledarsShadow'] = "Beledar's Shadow"
 L['timer:theaterTroupe'] = 'Theater Troupe'
 
@@ -160,6 +211,7 @@ L['timer:superbloom'] = 'Superbloom'
 L['timer:timeRift'] = 'Time Rift'
 
 L['objective:defeat_x'] = 'Defeat %s'
+L['objective:bring_x'] = 'Bring %sx %s'
 
 L['choose_quest'] = 'Choose a quest!'
 
@@ -168,3 +220,14 @@ L['questName:80545'] = 'The General'
 L['questName:80546'] = 'The Vizier'
 
 L['missing_skill_level'] = '|cFFFF00FFOpen profession window!|r'
+L['remove_specialAssignment'] = 'Special Assignment: '
+
+-- Auto-Accept
+L['autoAccept:choresEvents:holidays:delves'] = '^Bonus Event: Delves$'
+L['autoAccept:choresEvents:holidays:mythicDungeons'] = '^Bonus Event: Dungeons$'
+L['autoAccept:choresEvents:holidays:worldQuests'] = '^Bonus Event: World Quests$'
+L['autoAccept:choresPvp:weekly:battlegrounds'] = '^Bonus Event: Battlegrounds$'
+L['autoAccept:choresPvp:weekly:sparks'] = '^Sparks of War:'
+L['autoAccept:choresWarWithin:patch_11_0_0:dungeon'] = '^Biergoth in Dornogal'
+L['autoAccept:choresWarWithin:patch_11_0_0:emissaryDelves'] = '^Speak to Brann Bronzebeard'
+L['autoAccept:choresWarWithin:patch_11_0_0:theaterTroupe'] = '^Theater Troupe$'

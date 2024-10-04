@@ -35,6 +35,15 @@ Addon.data.chores.professionEnchanting = {
             },
             quests = {
                 {
+                    key = 'task',
+                    skill = 20,
+                    entries = {
+                        { quest=84084 }, -- Just a Pinch
+                        { quest=84085 }, -- The Power of Potential
+                        { quest=84086 }, -- A Rare Necessity
+                    },
+                },
+                {
                     key = 'treatise',
                     entries = {
                         { quest=83727, item=222550 }, -- Algari Treatise on Enchanting

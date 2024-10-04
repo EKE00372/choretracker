@@ -1,3 +1,105 @@
+v11.0.2.23
+----------
+- Added auto-accept for Delves weekly quests.
+- Changed "Emissary" to be 3 separate groups (Archives/Delves/Worldsoul).
+
+v11.0.2.22
+----------
+- Added a one-time message letting you know that auto accept is an option.
+- Changed which chores are enabled by default, no more Dragonflight/PvP/Darkmoon Faire.
+- Changed auto-accepted quests to be off by default again, it starts way too many quests.
+- Fixed Delves bonus event minimum level.
+
+v11.0.2.21
+----------
+- Added Delves bonus event to auto-accept list.
+- Added zhCN/zhTW matchers for auto-accept. I have no idea if they work.
+- Changed auto-accepting quests to be on by default.
+- Fixed Delves bonus event not actually tracking the quest.
+
+v11.0.2.20
+----------
+- Added an EARLY VERSION of auto-accepting some quests from the Adventure Journal.
+  Enable it in Options>General>Automation.
+
+v11.0.2.19b
+----------
+- Fixed leftover duplicate chore entries.
+
+v11.0.2.19
+----------
+- Added options to control section order.
+- Added "Preserving" PvP weekly chores.
+- Changed Dragonflight chores to sort after The War Within.
+- Moved PvP chores to a new PvP section.
+- Fixed event IDs for Events chores (GH32).
+- Fixed minimum levels for Events chores.
+
+v11.0.2.18
+----------
+- Added Bountiful Delves display.
+- Added new TWE Enchanting Task (thanks Sluimerstand).
+- Updated zhCN locale (thanks Sefank).
+
+v11.0.2.17
+----------
+- Added Skin Slatefang profession chore.
+- Changed progress bar objectives (eg Spider Weekly) to show % at the start of the
+  objective text.
+- Changed Spider Weekly chore to always show objectives.
+- Updated timer for Theater Troupe, it starts at xx:01.
+- Updated minimum level for Theater Troupe chore.
+- Updated minimum level for Timewalking event chores.
+
+v11.0.2.16
+----------
+- Updated quest ID for A Burning Path Through Time.
+
+v11.0.2.15
+----------
+- Added TWW Enchanting Tasks.
+- Reduced the minimum frame height from 150 to 100 (GH26).
+
+v11.0.2.14
+----------
+- Fixed TWW World Boss quest name.
+- Fixed Special Assignment: Titanic Resurgence not always showing up correctly.
+
+v11.0.2.13
+----------
+- Added TWW World Boss chore.
+- Updated zhCN locale (thanks Sefank).
+
+v11.0.2.12
+----------
+- Added cleaning up of old data on login, the saved file should stop growing
+  quite so large.
+- Fixed some chores showing as in progress without a related quest.
+- Updated event quest IDs.
+
+v11.0.2.11
+----------
+- Fixed zhCN locale error.
+
+v11.0.2.10
+----------
+- Added TWW Special Assignment chore.
+- Changed objectives to not show irrelevant optional ones.
+- Fixed being able to drag the frame off the screen.
+- Fixed lock button so that it actually disables/enables mouse events properly (GH6).
+- Fixed lock button not updating between locked/unlocked when minimized.
+- Updated zhCN/zhTW localizations (thanks Sefank).
+
+v11.0.2.9
+---------
+- Changed "Worldsoul" chore to "Emissary" and added the missing weekly quests.
+
+v11.0.2.8
+---------
+- Added more Darkmoon Faire event chores.
+- Added zhCN localization (thanks EKE00372).
+- Added zhTW localization (thanks EKE00372).
+
 v11.0.2.7
 ---------
 - Added "Disable ALL DF chores" and "Enable ALL DF chores" buttons to options.
